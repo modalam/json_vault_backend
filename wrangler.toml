@@ -1,0 +1,72 @@
+name = "jsonvault-api"
+main = "src/index.ts"
+compatibility_date = "2025-01-01"
+compatibility_flags = ["nodejs_compat"]
+
+# Local:  pnpm dev / wrangler dev   → Worker on localhost, D1 (+ KV) on Cloudflare
+# Remote: pnpm deploy / wrangler deploy → Worker on Cloudflare, same D1 + KV
+#
+# Offline (no cloud): pnpm dev:offline
+
+[vars]
+ENVIRONMENT = "development"
+JWT_ISSUER = "jsonvault.app"
+JWT_AUDIENCE = "jsonvault-api"
+JWT_SECRET = "dev-change-me-before-production"
+CORS_ORIGINS = "http://localhost:5173,http://localhost:3000,https://jsonvault-web.pages.dev"
+MAX_BLOB_SIZE_BYTES = "52428800"
+INLINE_STORAGE_THRESHOLD = "262144"
+ANONYMOUS_BLOB_TTL_DAYS = "90"
+FRONTEND_URL = "https://jsonvault-web.pages.dev"
+API_URL = "https://jsonvault-api.modassiralam92.workers.dev"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "jsonvault-db"
+database_id = "6cddf3b7-ed63-4820-babc-2dc0c85801af"
+migrations_dir = "src/db/migrations"
+remote = true
+
+[[kv_namespaces]]
+binding = "KV"
+id = "0c761e6bc4ff4804b5bb20c5ce954dab"
+preview_id = "565a6d0274164e9c999141b0f2090d2d"
+remote = true
+
+# R2 (optional until enabled in Cloudflare Dashboard):
+# 1. Enable R2 in the dashboard
+# 2. wrangler r2 bucket create jsonvault-dev
+# 3. Uncomment the block below (and the env.*.r2_buckets blocks)
+#
+# [[r2_buckets]]
+# binding = "BUCKET"
+# bucket_name = "jsonvault-dev"
+# remote = true
+
+[env.staging]
+name = "jsonvault-api-staging"
+vars = { ENVIRONMENT = "staging", CORS_ORIGINS = "https://staging.jsonvault.app,http://localhost:5173", FRONTEND_URL = "https://staging.jsonvault.app", API_URL = "https://api-staging.jsonvault.app" }
+
+[[env.staging.d1_databases]]
+binding = "DB"
+database_name = "jsonvault-db"
+database_id = "6cddf3b7-ed63-4820-babc-2dc0c85801af"
+migrations_dir = "src/db/migrations"
+
+[[env.staging.kv_namespaces]]
+binding = "KV"
+id = "0c761e6bc4ff4804b5bb20c5ce954dab"
+
+[env.production]
+name = "jsonvault-api"
+vars = { ENVIRONMENT = "production", CORS_ORIGINS = "https://jsonvault.app", FRONTEND_URL = "https://jsonvault.app", API_URL = "https://api.jsonvault.app" }
+
+[[env.production.d1_databases]]
+binding = "DB"
+database_name = "jsonvault-db"
+database_id = "6cddf3b7-ed63-4820-babc-2dc0c85801af"
+migrations_dir = "src/db/migrations"
+
+[[env.production.kv_namespaces]]
+binding = "KV"
+id = "0c761e6bc4ff4804b5bb20c5ce954dab"

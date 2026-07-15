@@ -1,0 +1,16 @@
+import { createMiddleware } from 'hono/factory';
+import type { AppVariables, Env } from '../types/env';
+
+export const secureHeadersMiddleware = createMiddleware<{
+  Bindings: Env;
+  Variables: AppVariables;
+}>(async (c, next) => {
+  await next();
+  c.header('Strict-Transport-Security', 'max-age=31536000; includeSubDomains; preload');
+  c.header('X-Content-Type-Options', 'nosniff');
+  c.header('X-Frame-Options', 'DENY');
+  c.header('Referrer-Policy', 'strict-origin-when-cross-origin');
+  c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
+  c.header('Cross-Origin-Opener-Policy', 'same-origin');
+  c.header('Cross-Origin-Resource-Policy', 'cross-origin');
+});
