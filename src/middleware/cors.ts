@@ -13,7 +13,7 @@ export function createCorsMiddleware(env: Env) {
       }
       return origins.includes(origin) ? origin : origins[0] ?? '';
     },
-    allowMethods: ['GET', 'POST', 'OPTIONS'],
+    allowMethods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
     allowHeaders: ['Authorization', 'Content-Type', 'X-Edit-Token', 'X-Request-Id'],
     exposeHeaders: [
       'Location',
