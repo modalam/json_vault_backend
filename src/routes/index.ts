@@ -9,12 +9,14 @@ import { jsonBlobCompatRoutes } from './jsonblob';
 import { authRoutes } from './auth';
 import { vaultRoutes } from './vaults';
 import { blobListRoutes } from './blobs';
+import { requestWorkspaceRoutes } from './request-workspaces';
 
 export const apiRoutes = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
 apiRoutes.route('/v1/auth', authRoutes);
 apiRoutes.route('/v1/vaults', vaultRoutes);
 apiRoutes.route('/v1/blobs', blobListRoutes);
+apiRoutes.route('/v1/request-workspaces', requestWorkspaceRoutes);
 apiRoutes.route('/v1/createblobs', createBlobsRoutes);
 apiRoutes.route('/v1/getblobs', getBlobsRoutes);
 apiRoutes.route('/v1/updateblobs', updateBlobsRoutes);

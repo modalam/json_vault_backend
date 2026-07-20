@@ -12,7 +12,9 @@ compatibility_flags = ["nodejs_compat"]
 ENVIRONMENT = "development"
 JWT_ISSUER = "jsonvault.app"
 JWT_AUDIENCE = "jsonvault-api"
-JWT_SECRET = "dev-change-me-before-production"
+# JWT_SECRET is a Cloudflare secret — never put it in [vars] (deploys would overwrite production).
+# Local: set in .dev.vars (gitignored)
+# Remote: wrangler secret put JWT_SECRET
 CORS_ORIGINS = "http://localhost:5173,http://localhost:3000,https://jsonvault-web.pages.dev"
 MAX_BLOB_SIZE_BYTES = "52428800"
 INLINE_STORAGE_THRESHOLD = "262144"

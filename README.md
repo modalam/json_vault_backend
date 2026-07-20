@@ -14,15 +14,27 @@ Cloudflare Workers API built with Hono + TypeScript.
 nvm use   # Node 22 from repo .nvmrc
 pnpm install
 cp .dev.vars.example .dev.vars
+# Edit .dev.vars and set JWT_SECRET for local auth
 
 # Apply schema to Cloudflare D1 (skip if already migrated)
 pnpm db:migrate:remote
+
+# Set production JWT secret once (do not put secrets in wrangler.toml)
+pnpm exec wrangler secret put JWT_SECRET
 
 # Local Worker + remote Cloudflare D1
 pnpm dev
 ```
 
 API: `http://localhost:8787`
+
+## Secrets
+
+| Secret | Local | Cloudflare |
+|--------|-------|------------|
+| `JWT_SECRET` | `.dev.vars` (gitignored) | `wrangler secret put JWT_SECRET` |
+
+Keep secrets **out of** `wrangler.toml` `[vars]`. Plain `[vars]` are uploaded on every deploy and can overwrite dashboard secrets.
 
 ## Dev vs deploy
 

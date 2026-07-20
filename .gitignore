@@ -1,0 +1,4 @@
+# Local Cloudflare Wrangler state and machine-specific overrides
+.wrangler/
+.wrangler.toml
+.dev.vars

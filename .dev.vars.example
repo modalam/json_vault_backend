@@ -1,3 +1,10 @@
-# Copy to .dev.vars for local secrets (gitignored)
-# Phase 1 does not require JWT/OAuth secrets for blob CRUD.
+# Local secrets for `wrangler dev` (gitignored — do not commit).
+#   cp .dev.vars.example .dev.vars
+
 ENVIRONMENT=development
+JWT_SECRET=local-dev-only-change-me
+
+# Production / staging secrets are set on Cloudflare, not here:
+#   pnpm exec wrangler secret put JWT_SECRET
+#   pnpm exec wrangler secret put JWT_SECRET --env staging
+#   pnpm exec wrangler secret put JWT_SECRET --env production
