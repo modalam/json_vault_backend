@@ -22,6 +22,10 @@ ANONYMOUS_BLOB_TTL_DAYS = "90"
 FRONTEND_URL = "https://jsonvault-web.pages.dev"
 API_URL = "https://jsonvault-api.modassiralam92.workers.dev"
 
+# Cloudflare Workers AI (free daily neuron allocation on Free plan)
+[ai]
+binding = "AI"
+
 [[d1_databases]]
 binding = "DB"
 database_name = "jsonvault-db"

@@ -2,6 +2,8 @@ export type Env = {
   DB: D1Database;
   BUCKET?: R2Bucket;
   KV: KVNamespace;
+  /** Cloudflare Workers AI binding (optional until [ai] is configured). */
+  AI?: Ai;
   ENVIRONMENT: string;
   JWT_ISSUER: string;
   JWT_AUDIENCE: string;
