@@ -3,7 +3,8 @@ import { AppError } from '../utils/errors';
 import { ERROR_CODES } from '../constants/error-codes';
 import type { ExplainDiffInput } from '../schemas/ai.schema';
 
-const MODEL = '@cf/meta/llama-3.1-8b-instruct';
+/** Active Workers AI variant; plain `llama-3.1-8b-instruct` was deprecated 2026-05-30. */
+const MODEL = '@cf/meta/llama-3.1-8b-instruct-fast';
 const MAX_ENTRIES_FOR_PROMPT = 40;
 const MAX_VALUE_CHARS = 120;
 const DAILY_LIMIT = 40;
