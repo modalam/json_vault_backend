@@ -12,3 +12,34 @@ export const ExplainDiffSchema = z.object({
 });
 
 export type ExplainDiffInput = z.infer<typeof ExplainDiffSchema>;
+
+/** Max serialized JSON size accepted for AI explain (keeps prompt/neuron cost bounded). */
+export const EXPLAIN_JSON_MAX_CHARS = 120_000;
+
+export const ExplainJsonSchema = z
+  .object({
+    json: z.unknown(),
+    name: z.string().max(200).optional(),
+  })
+  .superRefine((value, ctx) => {
+    let serialized: string;
+    try {
+      serialized = JSON.stringify(value.json) ?? '';
+    } catch {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: 'json must be JSON-serializable',
+        path: ['json'],
+      });
+      return;
+    }
+    if (serialized.length > EXPLAIN_JSON_MAX_CHARS) {
+      ctx.addIssue({
+        code: z.ZodIssueCode.custom,
+        message: `json exceeds ${EXPLAIN_JSON_MAX_CHARS} characters when serialized`,
+        path: ['json'],
+      });
+    }
+  });
+
+export type ExplainJsonInput = z.infer<typeof ExplainJsonSchema>;
