@@ -3,9 +3,12 @@ import type { AppVariables, Env } from '../../types/env';
 import { CreateBlobSchema } from '../../schemas/blob.schema';
 import * as blobService from '../../services/blob.service';
 import * as authService from '../../services/auth.service';
+import * as quotaService from '../../services/quota.service';
+import { writeAuditLog } from '../../services/audit.service';
 import { AppError } from '../../utils/errors';
 import { ERROR_CODES } from '../../constants/error-codes';
 import { SUCCESS_CODES } from '../../constants/success-codes';
+import { assertApiKeyScope } from '../../middleware/auth';
 
 type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
 
@@ -39,10 +42,17 @@ export async function createBlobHandler(c: AppContext) {
     });
   }
 
+  assertApiKeyScope(c, 'blobs:write');
+
   const auth = c.get('auth');
   let vaultId: string | null = parsed.data.vaultId ?? null;
   if (auth && !vaultId) {
     vaultId = await authService.getDefaultVaultId(c.env, auth.userId);
+  }
+
+  if (auth) {
+    const sizeEstimate = new TextEncoder().encode(JSON.stringify(parsed.data.content)).byteLength;
+    await quotaService.assertCanCreateBlob(c.env, auth.userId, auth.plan, sizeEstimate);
   }
 
   const result = await blobService.createBlob(c.env, parsed.data, {
@@ -50,6 +60,14 @@ export async function createBlobHandler(c: AppContext) {
     vaultId,
   });
   c.header('Location', `${c.env.API_URL}/api/v1/blobs/${result.id}`);
+
+  await writeAuditLog(c.env, {
+    userId: auth?.userId ?? null,
+    action: 'blob.create',
+    resourceType: 'blob',
+    resourceId: result.id,
+    ipAddress: c.get('clientIp'),
+  });
 
   return c.json(
     {

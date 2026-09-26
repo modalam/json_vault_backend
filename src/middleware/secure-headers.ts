@@ -13,4 +13,8 @@ export const secureHeadersMiddleware = createMiddleware<{
   c.header('Permissions-Policy', 'camera=(), microphone=(), geolocation=()');
   c.header('Cross-Origin-Opener-Policy', 'same-origin');
   c.header('Cross-Origin-Resource-Policy', 'cross-origin');
+  c.header(
+    'Content-Security-Policy',
+    "default-src 'none'; frame-ancestors 'none'; base-uri 'none'",
+  );
 });

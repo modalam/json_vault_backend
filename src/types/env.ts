@@ -14,12 +14,17 @@ export type Env = {
   ANONYMOUS_BLOB_TTL_DAYS: string;
   FRONTEND_URL: string;
   API_URL: string;
+  /** Optional Sentry DSN for backend error reporting. */
+  SENTRY_DSN?: string;
 };
 
 export type AuthContext = {
   userId: string;
   email: string;
   plan: string;
+  authType: 'jwt' | 'api_key';
+  scopes?: string[];
+  apiKeyId?: string;
 };
 
 export type AppVariables = {

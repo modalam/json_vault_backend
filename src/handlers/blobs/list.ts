@@ -1,7 +1,7 @@
 import type { Context } from 'hono';
 import type { AppVariables, Env } from '../../types/env';
 import * as blobQueries from '../../db/queries/blobs';
-import { requireAuth } from '../../middleware/auth';
+import { requireScope } from '../../middleware/auth';
 
 type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
 
@@ -16,7 +16,7 @@ function parseTags(raw: string | null): string[] {
 }
 
 export async function listBlobsHandler(c: AppContext) {
-  const auth = requireAuth(c);
+  const auth = requireScope(c, 'blobs:read');
   const vaultId = c.req.query('vaultId') ?? undefined;
   const limit = Number(c.req.query('limit') ?? '20');
 

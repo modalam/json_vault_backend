@@ -5,6 +5,7 @@ import * as blobService from '../../services/blob.service';
 import { AppError } from '../../utils/errors';
 import { ERROR_CODES } from '../../constants/error-codes';
 import { SUCCESS_CODES } from '../../constants/success-codes';
+import { assertApiKeyScope } from '../../middleware/auth';
 
 type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
 
@@ -32,6 +33,8 @@ export async function getBlobsHandler(c: AppContext) {
       fields: parsed.error.flatten().fieldErrors,
     });
   }
+
+  assertApiKeyScope(c, 'blobs:read');
 
   const content = await blobService.getBlobContent(
     c.env,

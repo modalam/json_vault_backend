@@ -2,9 +2,10 @@ import type { Context } from 'hono';
 import type { AppVariables, Env } from '../../types/env';
 import { RegisterSchema, LoginSchema, RefreshSchema, LogoutSchema } from '../../schemas/auth.schema';
 import * as authService from '../../services/auth.service';
+import { writeAuditLog } from '../../services/audit.service';
 import { AppError } from '../../utils/errors';
 import { ERROR_CODES } from '../../constants/error-codes';
-import { requireAuth } from '../../middleware/auth';
+import { requireAuth, requireScope } from '../../middleware/auth';
 
 type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
 
@@ -47,6 +48,13 @@ export async function loginHandler(c: AppContext) {
   }
 
   const result = await authService.login(c.env, parsed.data);
+  await writeAuditLog(c.env, {
+    userId: result.user.id,
+    action: 'auth.login',
+    resourceType: 'user',
+    resourceId: result.user.id,
+    ipAddress: c.get('clientIp'),
+  });
   return c.json({ data: result });
 }
 
@@ -78,7 +86,7 @@ export async function logoutHandler(c: AppContext) {
 }
 
 export async function meHandler(c: AppContext) {
-  const auth = requireAuth(c);
+  const auth = requireScope(c, 'users:read');
   const user = await authService.getMe(c.env, auth.userId);
   return c.json({ data: user });
 }

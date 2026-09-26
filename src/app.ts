@@ -6,10 +6,12 @@ import { secureHeadersMiddleware } from './middleware/secure-headers';
 import { createCorsMiddleware } from './middleware/cors';
 import { editTokenMiddleware } from './middleware/edit-token';
 import { authMiddleware } from './middleware/auth';
+import { planRateLimitMiddleware } from './middleware/plan-rate-limit';
 import { apiRoutes } from './routes';
 import { healthRoutes } from './routes/health';
 import { AppError } from './utils/errors';
 import { ERROR_CODES } from './constants/error-codes';
+import { captureException } from './utils/sentry';
 
 export function createApp() {
   const app = new Hono<{ Bindings: Env; Variables: AppVariables }>();
@@ -23,6 +25,7 @@ export function createApp() {
   });
   app.use('*', editTokenMiddleware);
   app.use('*', authMiddleware);
+  app.use('/api/v1/*', planRateLimitMiddleware);
 
   app.route('/health', healthRoutes);
   app.route('/api', apiRoutes);
@@ -51,7 +54,7 @@ export function createApp() {
             details: err.details ?? {},
           },
         },
-        err.statusCode as 400 | 401 | 403 | 404 | 409 | 413 | 415 | 429 | 500,
+        err.statusCode as 400 | 401 | 402 | 403 | 404 | 409 | 413 | 415 | 429 | 500,
       );
     }
 
@@ -64,6 +67,8 @@ export function createApp() {
         timestamp: new Date().toISOString(),
       }),
     );
+
+    void captureException(c.env, err, { requestId: c.get('requestId') });
 
     return c.json(
       {

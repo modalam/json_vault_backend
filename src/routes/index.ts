@@ -11,6 +11,9 @@ import { vaultRoutes } from './vaults';
 import { blobListRoutes } from './blobs';
 import { requestWorkspaceRoutes } from './request-workspaces';
 import { aiRoutes } from './ai';
+import { apiKeyRoutes } from './api-keys';
+import { usageRoutes } from './usage';
+import { openApiRoutes } from './openapi';
 
 export const apiRoutes = new Hono<{ Bindings: Env; Variables: AppVariables }>();
 
@@ -19,6 +22,9 @@ apiRoutes.route('/v1/vaults', vaultRoutes);
 apiRoutes.route('/v1/blobs', blobListRoutes);
 apiRoutes.route('/v1/request-workspaces', requestWorkspaceRoutes);
 apiRoutes.route('/v1/ai', aiRoutes);
+apiRoutes.route('/v1/api-keys', apiKeyRoutes);
+apiRoutes.route('/v1/usage', usageRoutes);
+apiRoutes.route('/v1', openApiRoutes);
 apiRoutes.route('/v1/createblobs', createBlobsRoutes);
 apiRoutes.route('/v1/getblobs', getBlobsRoutes);
 apiRoutes.route('/v1/updateblobs', updateBlobsRoutes);

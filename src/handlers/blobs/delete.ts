@@ -2,9 +2,11 @@ import type { Context } from 'hono';
 import type { AppVariables, Env } from '../../types/env';
 import { BlobIdParamSchema, GetBlobSchema } from '../../schemas/blob.schema';
 import * as blobService from '../../services/blob.service';
+import { writeAuditLog } from '../../services/audit.service';
 import { AppError } from '../../utils/errors';
 import { ERROR_CODES } from '../../constants/error-codes';
 import { SUCCESS_CODES } from '../../constants/success-codes';
+import { assertApiKeyScope } from '../../middleware/auth';
 
 type AppContext = Context<{ Bindings: Env; Variables: AppVariables }>;
 
@@ -33,7 +35,18 @@ export async function deleteBlobHandler(c: AppContext) {
     });
   }
 
+  assertApiKeyScope(c, 'blobs:write');
+
   await blobService.deleteBlob(c.env, parsed.data.id, c.get('editToken'));
+
+  const auth = c.get('auth');
+  await writeAuditLog(c.env, {
+    userId: auth?.userId ?? null,
+    action: 'blob.delete',
+    resourceType: 'blob',
+    resourceId: parsed.data.id,
+    ipAddress: c.get('clientIp'),
+  });
 
   return c.json({
     success: SUCCESS_CODES.BLOB_DELETED,

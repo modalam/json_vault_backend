@@ -26,6 +26,10 @@ API_URL = "https://jsonvault-api.modassiralam92.workers.dev"
 [ai]
 binding = "AI"
 
+# Expire anonymous blobs daily at 03:00 UTC
+[triggers]
+crons = ["0 3 * * *"]
+
 [[d1_databases]]
 binding = "DB"
 database_name = "jsonvault-db"
